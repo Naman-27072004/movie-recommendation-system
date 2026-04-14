@@ -2,6 +2,8 @@ import streamlit as st
 import pickle
 import pandas as pd
 import requests
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Add a background image using CSS
 st.markdown(
@@ -77,12 +79,22 @@ def recommend(movie):
 st.title('🎬 Movie Recommender System')
 
 # Load movie data and similarity matrix
-try:
+@st.cache_resource
+def load_data_and_similarity():
     movies_dict = pickle.load(open('movies_dict.pkl', 'rb'))
-    similarity = pickle.load(open('similarity.pkl', 'rb'))
     movies = pd.DataFrame(movies_dict)
+    
+    # Calculate similarity on the fly
+    cv = CountVectorizer(max_features=5000, stop_words='english')
+    vectors = cv.fit_transform(movies['tags']).toarray()
+    similarity = cosine_similarity(vectors)
+    
+    return movies, similarity
+
+try:
+    movies, similarity = load_data_and_similarity()
 except Exception as e:
-    st.error(f"Failed to load data files: {e}")
+    st.error(f"Failed to process data: {e}")
     st.stop()
 
 # Dropdown to select a movie
