@@ -35,7 +35,7 @@ st.markdown(
 # Function to fetch movie poster using the movie ID
 def fetch_poster(movie_id):
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=d1ddd1a73c6cac921af93b10a4a36d93&language=en-US"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={st.secrets['TMDB_API_KEY']}&language=en-US"
         data = requests.get(url).json()
         poster_path = data.get('poster_path')
         if poster_path:
